@@ -1,0 +1,22 @@
+---
+
+- name: Install datadog log metrics dependencies
+  pip:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - pygtail
+    - datadog
+
+- name: Install datadog log metrics forwarder script
+  template:
+    src: datadog_nginx.py.j2
+    dest: "{{ nginx_datadog_log_forwarder_script_path }}_{{ item }}"
+    mode: 0755
+  with_items: "{{ nginx_datadog_log_forwarder_targets|default([]) }}"
+
+- name: Setup datadog log metrics cron job
+  cron:
+    name: "forward nginx log metrics to datadog for {{ item }}"
+    job: "{{ nginx_datadog_log_forwarder_script_path }}_{{ item }}"
+  with_items: "{{ nginx_datadog_log_forwarder_targets|default([]) }}"

@@ -43,3 +43,7 @@
   service: name={{ nginx_service_name }} state=started enabled=yes
   when: nginx_installation_type in nginx_installation_types_using_service and nginx_daemon_mode == "on"
   tags: [service, nginx]
+
+- include: datadog.yml
+  when: nginx_datadog_log_forwarder == True
+  tags: [datadog, nginx]
